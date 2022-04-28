@@ -3,7 +3,9 @@ package fi.tuni.tamk.tiko.weatherappcompose
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -14,6 +16,9 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -39,6 +44,18 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun Layout() {
+    Box(Modifier
+        .fillMaxWidth()
+        .fillMaxHeight()
+        .background(
+            Brush.verticalGradient(
+            listOf(
+                Color(0xFFD16BA5),
+                Color(0xFF86A8E7),
+                Color(0xFFCEFFFC)
+            )
+        ))
+    )
     Column(modifier = Modifier
         .padding(20.dp),
         verticalArrangement = Arrangement.Top,
@@ -71,6 +88,8 @@ fun Forecast() {
                 .height(200.dp)
                 .padding(12.dp),
             shape = RoundedCornerShape(corner = CornerSize(15.dp)),
+            backgroundColor = Color.White.copy(alpha = 0.2f),
+            border = BorderStroke(1.dp, Color.White.copy(alpha = 0.8f))
         ) {
 
         }
@@ -86,6 +105,8 @@ fun CurrentDetails() {
                 .height(125.dp)
                 .padding(12.dp),
             shape = RoundedCornerShape(corner = CornerSize(15.dp)),
+            backgroundColor = Color.White.copy(alpha = 0.2f),
+            border = BorderStroke(1.dp, Color.White.copy(alpha = 0.8f))
         ) {
 
         }
@@ -96,7 +117,8 @@ fun Location() {
     Text(
         text = "Location Here",
         textAlign = TextAlign.Center,
-        style = MaterialTheme.typography.h4
+        style = MaterialTheme.typography.h4,
+        color = Color.White
     )
 }
 
@@ -113,7 +135,8 @@ fun CurrentWeather() {
             Text(
                 text = "27°C",
                 textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.h2
+                style = MaterialTheme.typography.h2,
+                color = Color.White
             )
             Image(
                 painter = painterResource(id = R.drawable.sun),
