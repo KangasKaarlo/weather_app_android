@@ -1,6 +1,8 @@
 package fi.tuni.tamk.tiko.weatherappcompose
 
 import android.os.Bundle
+import android.telecom.Call
+import android.widget.Space
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.BorderStroke
@@ -24,6 +26,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import fi.tuni.tamk.tiko.weatherappcompose.ui.theme.WeatherAppComposeTheme
+import org.intellij.lang.annotations.JdkConstants
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -44,17 +47,19 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun Layout() {
-    Box(Modifier
-        .fillMaxWidth()
-        .fillMaxHeight()
-        .background(
-            Brush.verticalGradient(
-            listOf(
-                Color(0xFFD16BA5),
-                Color(0xFF86A8E7),
-                Color(0xFFCEFFFC)
+    Box(
+        Modifier
+            .fillMaxWidth()
+            .fillMaxHeight()
+            .background(
+                Brush.verticalGradient(
+                    listOf(
+                        Color(0xFFD16BA5),
+                        Color(0xFF86A8E7),
+                        Color(0xFFCEFFFC)
+                    )
+                )
             )
-        ))
     )
     Column(modifier = Modifier
         .padding(20.dp),
@@ -109,7 +114,21 @@ fun CurrentDetails() {
             border = BorderStroke(1.dp, Color.White.copy(alpha = 0.8f))
         ) {
 
-        }
+                Row(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(20.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceEvenly
+
+                ) {
+                    Detail(img = "weatherImg", text = "Wind")
+                    Detail(img = "weatherImg", text = "Dir")
+                    Detail(img = "weatherImg", text = "Humidity")
+                    Detail(img = "weatherImg", text = "Rain")
+
+                }
+            }
 }
 
 @Composable
@@ -123,8 +142,27 @@ fun Location() {
 }
 
 @Composable
+fun Detail(img : String, text : String) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.SpaceBetween,
+        modifier = Modifier.fillMaxHeight()
+    ) {
+        Image(
+            painter = painterResource(id = R.drawable.sun),
+            contentDescription = img,
+            modifier = Modifier.size(25.dp))
+        Text(
+            text = text,
+            style = MaterialTheme.typography.subtitle1,
+            color = Color.White
+        )
+    }
+}
+
+@Composable
 fun CurrentWeather() {
-    val spacerSize = 125.dp
+    val spacerSize = 100.dp
     Column(
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
@@ -135,7 +173,7 @@ fun CurrentWeather() {
             Text(
                 text = "27°C",
                 textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.h2,
+                style = MaterialTheme.typography.h1,
                 color = Color.White
             )
             Image(
@@ -143,6 +181,11 @@ fun CurrentWeather() {
                 contentDescription = "weatherImg",
                 modifier = Modifier.size(35.dp))
         }
+        Text(
+            text = "Feels like 22°C",
+            style = MaterialTheme.typography.subtitle1,
+            color = Color.White
+        )
     }
     Spacer(modifier = Modifier.size(spacerSize))
 }
