@@ -86,31 +86,69 @@ fun DefaultPreview() {
 
 @Composable
 fun Forecast() {
-    Column() {
-        Card(
+
+        Surface(
             modifier = Modifier
                 .width(350.dp)
                 .height(200.dp)
                 .padding(12.dp),
             shape = RoundedCornerShape(corner = CornerSize(15.dp)),
-            backgroundColor = Color.White.copy(alpha = 0.2f),
+            color = Color.White.copy(alpha = 0.1f),
             border = BorderStroke(1.dp, Color.White.copy(alpha = 0.8f))
         ) {
-
+            Row(
+                modifier = Modifier
+                .fillMaxSize(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                ForecastDay(img = "sun", degree = "15°C", day = "Mon")
+                ForecastDay(img = "sun", degree = "17°C", day = "Tue")
+                ForecastDay(img = "sun", degree = "13°C", day = "Wen")
+                ForecastDay(img = "sun", degree = "11°C", day = "Thu")
+                ForecastDay(img = "sun", degree = "19°C", day = "Fri")
+            }
         }
-    }
+}
 
+@Composable
+fun ForecastDay(img : String, degree : String , day : String) {
+    Column(
+        modifier = Modifier
+            .padding(10.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.SpaceEvenly
+
+    ) {
+        Image(
+            painter = painterResource(id = R.drawable.sun),
+            contentDescription = img,
+            modifier = Modifier
+                .size(25.dp))
+        Spacer(modifier = Modifier.size(25.dp))
+        Text(
+            text = degree,
+            style = MaterialTheme.typography.body1,
+            color = Color.White
+        )
+        Spacer(modifier = Modifier.size(25.dp))
+        Text(
+            text = day,
+            style = MaterialTheme.typography.body1,
+            color = Color.White
+        )
+    }
 }
 
 @Composable
 fun CurrentDetails() {
-        Card(
+        Surface(
             modifier = Modifier
                 .width(350.dp)
                 .height(125.dp)
                 .padding(12.dp),
             shape = RoundedCornerShape(corner = CornerSize(15.dp)),
-            backgroundColor = Color.White.copy(alpha = 0.2f),
+            color = Color.White.copy(alpha = 0.1f),
             border = BorderStroke(1.dp, Color.White.copy(alpha = 0.8f))
         ) {
 
@@ -122,10 +160,10 @@ fun CurrentDetails() {
                     horizontalArrangement = Arrangement.SpaceEvenly
 
                 ) {
-                    Detail(img = "weatherImg", text = "Wind")
-                    Detail(img = "weatherImg", text = "Dir")
-                    Detail(img = "weatherImg", text = "Humidity")
-                    Detail(img = "weatherImg", text = "Rain")
+                    Detail(img = "sun", text = "Wind")
+                    Detail(img = "sun", text = "Dir")
+                    Detail(img = "sun", text = "Humidity")
+                    Detail(img = "sun", text = "Rain")
 
                 }
             }
@@ -154,7 +192,7 @@ fun Detail(img : String, text : String) {
             modifier = Modifier.size(25.dp))
         Text(
             text = text,
-            style = MaterialTheme.typography.subtitle1,
+            style = MaterialTheme.typography.body1,
             color = Color.White
         )
     }
