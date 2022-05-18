@@ -1,5 +1,6 @@
 package fi.tuni.tamk.tiko.weatherappcompose
 
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -10,6 +11,8 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -19,9 +22,27 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import fi.tuni.tamk.tiko.weatherappcompose.ui.theme.WeatherAppComposeTheme
+import java.io.BufferedReader
+import java.io.InputStreamReader
+import java.net.HttpURLConnection
+import java.net.URL
+import kotlin.concurrent.thread
+import com.google.gson.Gson
+import fi.tuni.tamk.tiko.weatherappcompose.dataclasses.WeatherObject
 
 @Composable
 fun ForecastLayout() {
+    val data = remember { mutableStateOf<WeatherObject>(WeatherObject()) }
+
+    downloadUrlAsync("https://api.openweathermap.org/data/2.5/weather?q=tampere&appid=ea7cbf93a213ae48e163cf692b5dfa54&units=metric") {
+        Log.d("main", it)
+        val gson = Gson()
+        val weather: WeatherObject = gson.fromJson(it, WeatherObject::class.java)
+        data.value = weather
+        Log.d("main", weather.name)
+
+    }
+
     Box(
         Modifier
             .fillMaxWidth()
@@ -42,7 +63,8 @@ fun ForecastLayout() {
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Location()
+
+        Location(data.value.name)
         CurrentWeather()
         CurrentDetails()
         Forecast()
@@ -137,9 +159,9 @@ fun CurrentDetails() {
 
 
 @Composable
-fun Location() {
+fun Location(header : String) {
     Text(
-        text = "Location Here",
+        text = header,
         textAlign = TextAlign.Center,
         style = MaterialTheme.typography.h4,
         color = Color.White
@@ -192,5 +214,22 @@ fun CurrentWeather() {
         color = Color.White
         )
         Spacer(modifier = Modifier.size(spacerSize))
+    }
+}
+
+private fun downloadUrlAsync(url: String, function: (String) -> Unit) {
+    thread {
+        val json = getUrl(url)
+            if (json != null) {
+                function(json)
+            }
+    }
+}
+
+fun getUrl(input: String) : String? {
+    val url = URL(input)
+    val connection: HttpURLConnection = url.openConnection() as HttpURLConnection
+    BufferedReader(InputStreamReader(connection.getInputStream())).use {
+        return it.readLine()
     }
 }
