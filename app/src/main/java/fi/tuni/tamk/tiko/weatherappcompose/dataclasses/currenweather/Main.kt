@@ -1,4 +1,4 @@
-package fi.tuni.tamk.tiko.weatherappcompose.dataclasses
+package fi.tuni.tamk.tiko.weatherappcompose.dataclasses.currenweather
 
 data class Main(
     val feels_like: Double = 0.00,

@@ -19,28 +19,36 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import fi.tuni.tamk.tiko.weatherappcompose.ui.theme.WeatherAppComposeTheme
+import coil.compose.rememberAsyncImagePainter
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
 import kotlin.concurrent.thread
 import com.google.gson.Gson
-import fi.tuni.tamk.tiko.weatherappcompose.dataclasses.WeatherObject
+import fi.tuni.tamk.tiko.weatherappcompose.dataclasses.currenweather.Main
+import fi.tuni.tamk.tiko.weatherappcompose.dataclasses.currenweather.WeatherObject
+import fi.tuni.tamk.tiko.weatherappcompose.dataclasses.forecast.ForecastObject
+import kotlin.math.roundToInt
 
 @Composable
 fun ForecastLayout() {
-    val data = remember { mutableStateOf<WeatherObject>(WeatherObject()) }
+    val currentWeather = remember { mutableStateOf<WeatherObject>(WeatherObject()) }
+    val foreCast = remember { mutableStateOf<ForecastObject>(ForecastObject()) }
+
+    downloadUrlAsync("https://api.openweathermap.org/data/2.5/forecast?q=tampere&appid=ea7cbf93a213ae48e163cf692b5dfa54&units=metric") {
+        Log.d("main", it)
+        val gson = Gson()
+        val weather: ForecastObject = gson.fromJson(it, ForecastObject::class.java)
+        foreCast.value = weather
+    }
 
     downloadUrlAsync("https://api.openweathermap.org/data/2.5/weather?q=tampere&appid=ea7cbf93a213ae48e163cf692b5dfa54&units=metric") {
         Log.d("main", it)
         val gson = Gson()
         val weather: WeatherObject = gson.fromJson(it, WeatherObject::class.java)
-        data.value = weather
-        Log.d("main", weather.name)
-
+        currentWeather.value = weather
     }
 
     Box(
@@ -64,10 +72,10 @@ fun ForecastLayout() {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
-        Location(data.value.name)
-        CurrentWeather()
-        CurrentDetails()
-        Forecast()
+        Location(currentWeather.value.name)
+        CurrentWeather(currentWeather.value)
+        CurrentDetails(currentWeather.value)
+        Forecast(forecast = foreCast.value)
     }
 }
 
@@ -75,7 +83,7 @@ fun ForecastLayout() {
 
 
 @Composable
-fun Forecast() {
+fun Forecast(forecast : ForecastObject) {
 
     Surface(
         modifier = Modifier
@@ -92,11 +100,17 @@ fun Forecast() {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-            ForecastDay(img = "sun", degree = "15°C", day = "Mon")
-            ForecastDay(img = "sun", degree = "17°C", day = "Tue")
-            ForecastDay(img = "sun", degree = "13°C", day = "Wen")
-            ForecastDay(img = "sun", degree = "11°C", day = "Thu")
-            ForecastDay(img = "sun", degree = "19°C", day = "Fri")
+            var listSize = 0
+            forecast.list.forEach {
+                if (it.dt_txt.contains("12:00:00") && listSize < 4) {
+                    if (listSize == 0) {
+                        listSize++
+                    } else {
+                        ForecastDay(img = it.weather[0].icon, degree = "${it.main.temp.roundToInt()}°C", day = "asd")
+                        listSize++
+                    }
+                }
+            }
         }
     }
 }
@@ -110,11 +124,11 @@ fun ForecastDay(img : String, degree : String , day : String) {
         verticalArrangement = Arrangement.SpaceEvenly
     ) {
         Image(
-            painter = painterResource(id = R.drawable.sun),
+            painter = rememberAsyncImagePainter("https://openweathermap.org/img/wn/${img}@2x.png"),
             contentDescription = img,
             modifier = Modifier
-               .size(25.dp))
-        Spacer(modifier = Modifier.size(25.dp))
+               .size(65.dp))
+        Spacer(modifier = Modifier.size(15.dp))
         Text(
             text = degree,
             style = MaterialTheme.typography.body1,
@@ -130,7 +144,7 @@ fun ForecastDay(img : String, degree : String , day : String) {
 }
 
 @Composable
-fun CurrentDetails() {
+fun CurrentDetails(data: WeatherObject) {
     Surface(
         modifier = Modifier
         .width(350.dp)
@@ -148,10 +162,10 @@ fun CurrentDetails() {
             horizontalArrangement = Arrangement.SpaceEvenly
 
         ) {
-            Detail(img = "sun", text = "Wind")
-            Detail(img = "sun", text = "Dir")
-            Detail(img = "sun", text = "Humidity")
-            Detail(img = "sun", text = "Rain")
+            Detail(data = "${data.wind.speed.toString()} m/s", text = "Wind")
+            Detail(data = data.wind.deg.toString(), text = "Dir")
+            Detail(data = data.main.humidity.toString(), text = "Humidity")
+            Detail(data = data.clouds.all.toString(), text = "Clouds")
 
         }
     }
@@ -169,16 +183,17 @@ fun Location(header : String) {
 }
 
 @Composable
-fun Detail(img : String, text : String) {
+fun Detail(data : String, text : String) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceBetween,
         modifier = Modifier.fillMaxHeight()
     ) {
-        Image(
-        painter = painterResource(id = R.drawable.sun),
-        contentDescription = img,
-        modifier = Modifier.size(25.dp))
+        Text(
+            text = data,
+            style = MaterialTheme.typography.body1,
+            color = Color.White
+        )
         Text(
         text = text,
         style = MaterialTheme.typography.body1,
@@ -188,7 +203,7 @@ fun Detail(img : String, text : String) {
 }
 
 @Composable
-fun CurrentWeather() {
+fun CurrentWeather(weather : WeatherObject) {
     val spacerSize = 75.dp
     Column(
         verticalArrangement = Arrangement.Top,
@@ -198,18 +213,18 @@ fun CurrentWeather() {
         Spacer(modifier = Modifier.size(spacerSize))
         Row() {
         Text(
-           text = "27°C",
+           text = weather.main.temp.roundToInt().toString(),
            textAlign = TextAlign.Center,
            style = MaterialTheme.typography.h1,
            color = Color.White
         )
         Image(
-           painter = painterResource(id = R.drawable.sun),
+           painter = rememberAsyncImagePainter("https://openweathermap.org/img/wn/${weather.weather[0].icon}@2x.png"),
            contentDescription = "weatherImg",
-           modifier = Modifier.size(35.dp))
+           modifier = Modifier.size(85.dp))
         }
         Text(
-        text = "Feels like 22°C",
+        text = "Feels like ${weather.main.feels_like.roundToInt()}",
         style = MaterialTheme.typography.subtitle1,
         color = Color.White
         )

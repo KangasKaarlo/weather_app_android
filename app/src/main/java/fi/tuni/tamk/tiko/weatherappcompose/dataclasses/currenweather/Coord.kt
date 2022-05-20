@@ -1,4 +1,4 @@
-package fi.tuni.tamk.tiko.weatherappcompose.dataclasses
+package fi.tuni.tamk.tiko.weatherappcompose.dataclasses.currenweather
 
 data class Coord(
     val lat: Double = 0.00,
