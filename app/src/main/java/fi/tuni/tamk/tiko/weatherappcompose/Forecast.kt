@@ -17,6 +17,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import java.io.BufferedReader
@@ -31,6 +32,7 @@ import fi.tuni.tamk.tiko.weatherappcompose.dataclasses.forecast.ForecastObject
 import kotlin.math.roundToInt
 
 @Composable
+@Preview(showSystemUi = true)
 fun ForecastLayout() {
     val currentWeather = remember { mutableStateOf<WeatherObject>(WeatherObject()) }
     val foreCast = remember { mutableStateOf<ForecastObject>(ForecastObject()) }
