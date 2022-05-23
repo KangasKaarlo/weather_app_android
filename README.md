@@ -14,3 +14,6 @@ Android/Kotlin
 
 ## Screencast
 https://youtu.be/KodOOSIukZE
+
+## Install
+To install download app-debug.apk to your android phone and install it as with any apk app.
