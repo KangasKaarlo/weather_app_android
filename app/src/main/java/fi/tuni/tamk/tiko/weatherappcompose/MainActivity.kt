@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import fi.tuni.tamk.tiko.weatherappcompose.ui.theme.WeatherAppComposeTheme
 import org.intellij.lang.annotations.JdkConstants
 
+//Start of the app
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

@@ -6,6 +6,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 
+//Adding destinations to Bottom Navigation items declared in BottomAppBar
 @Composable
 fun BottomNavGraph(navController: NavHostController) {
     NavHost(

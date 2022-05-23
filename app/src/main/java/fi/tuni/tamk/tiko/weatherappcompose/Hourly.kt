@@ -41,7 +41,7 @@ fun Hourly() {
         Surface(
             modifier = Modifier
                 .width(350.dp)
-                .height(700.dp)
+                .height(650.dp)
                 .padding(12.dp),
             shape = RoundedCornerShape(corner = CornerSize(15.dp)),
             color = Color.White.copy(alpha = 0.1f),
@@ -54,11 +54,16 @@ fun Hourly() {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "Today",
+                    text = "INFO",
                     color = Color.White,
                     style = MaterialTheme.typography.h4
                     )
-
+                Spacer(modifier = Modifier.size(20.dp))
+                Text(
+                    text = "This app was developed for a university course and displays the weather in Tampere Finland",
+                    color = Color.White,
+                    style = MaterialTheme.typography.body1
+                )
             }
 
         }

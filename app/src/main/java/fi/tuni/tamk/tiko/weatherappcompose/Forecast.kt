@@ -7,9 +7,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -37,6 +35,8 @@ fun ForecastLayout() {
     val currentWeather = remember { mutableStateOf<WeatherObject>(WeatherObject()) }
     val foreCast = remember { mutableStateOf<ForecastObject>(ForecastObject()) }
 
+
+    //Fetching the forecast
     downloadUrlAsync("https://api.openweathermap.org/data/2.5/forecast?q=tampere&appid=ea7cbf93a213ae48e163cf692b5dfa54&units=metric") {
         Log.d("main", it)
         val gson = Gson()
@@ -44,6 +44,7 @@ fun ForecastLayout() {
         foreCast.value = weather
     }
 
+    //Fetching current weather
     downloadUrlAsync("https://api.openweathermap.org/data/2.5/weather?q=tampere&appid=ea7cbf93a213ae48e163cf692b5dfa54&units=metric") {
         Log.d("main", it)
         val gson = Gson()
@@ -56,13 +57,13 @@ fun ForecastLayout() {
             .fillMaxWidth()
             .fillMaxHeight()
             .background(
-               Brush.verticalGradient(
-                   listOf(
-                       Color(0xFFD16BA5),
-                       Color(0xFF86A8E7),
-                       Color(0xFFCEFFFC)
-                   )
-               )
+                Brush.verticalGradient(
+                    listOf(
+                        Color(0xFFD16BA5),
+                        Color(0xFF86A8E7),
+                        Color(0xFFCEFFFC)
+                    )
+                )
             )
     )
     Column(
@@ -81,37 +82,56 @@ fun ForecastLayout() {
 
 
 
-
+//Box containing the forecast for the three following days
 @Composable
 fun Forecast(forecast : ForecastObject) {
 
     Surface(
         modifier = Modifier
-        .width(350.dp)
-        .height(200.dp)
-        .padding(12.dp),
+            .width(350.dp)
+            .height(200.dp)
+            .padding(12.dp),
         shape = RoundedCornerShape(corner = CornerSize(15.dp)),
         color = Color.White.copy(alpha = 0.1f),
         border = BorderStroke(1.dp, Color.White.copy(alpha = 0.8f))
     ) {
-        Row(
+        Column(
             modifier = Modifier
-               .fillMaxSize(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceEvenly
+            .padding(10.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.SpaceEvenly
         ) {
-            var listSize = 0
-            forecast.list.forEach {
-                if (it.dt_txt.contains("12:00:00") && listSize < 4) {
-                    if (listSize == 0) {
-                        listSize++
-                    } else {
-                        ForecastDay(img = it.weather[0].icon, degree = "${it.main.temp.roundToInt()}°C", day = "asd")
-                        listSize++
+            Text(
+                text = "3 Day Forecast",
+                style = MaterialTheme.typography.body1,
+                color = Color.White
+            )
+            Spacer(
+                modifier = Modifier
+                    .size(15.dp),
+            )
+            Divider(color = Color.White.copy(alpha = 0.8f))
+            Row(
+                modifier = Modifier
+                    .fillMaxSize(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                var listSize = 0
+                forecast.list.forEach {
+                    //Making sure we are displaying the weather at noon and dismissing all the unnecessary data given by the API
+                    if (it.dt_txt.contains("12:00:00") && listSize < 4) {
+                        if (listSize == 0) {
+                            listSize++
+                        } else {
+                            ForecastDay(img = it.weather[0].icon, degree = "${it.main.temp.roundToInt()}°C", day = "asd")
+                            listSize++
+                        }
                     }
                 }
             }
         }
+
     }
 }
 
@@ -145,11 +165,13 @@ fun ForecastDay(img : String, degree : String , day : String) {
 
 @Composable
 fun CurrentDetails(data: WeatherObject) {
+    val directions = listOf<String>("N","NNE","NE","ENE","E","ESE","SE","SSE","S","SSW","SW","WSW","W","WNW","NW","NNW","N");
+
     Surface(
         modifier = Modifier
-        .width(350.dp)
-        .height(125.dp)
-        .padding(12.dp),
+            .width(350.dp)
+            .height(125.dp)
+            .padding(12.dp),
         shape = RoundedCornerShape(corner = CornerSize(15.dp)),
         color = Color.White.copy(alpha = 0.1f),
         border = BorderStroke(1.dp, Color.White.copy(alpha = 0.8f))
@@ -163,9 +185,10 @@ fun CurrentDetails(data: WeatherObject) {
 
         ) {
             Detail(data = "${data.wind.speed.toString()} m/s", text = "Wind")
-            Detail(data = data.wind.deg.toString(), text = "Dir")
+            //+180 % 360 cause OpenWeatherMap gives the direction the wind is coming from
+            //and we want to show the direction it's going to
+            Detail(data = directions[((data.wind.deg  + 180) % 360  / 22.5).roundToInt()], text = "Dir")
             Detail(data = data.main.humidity.toString(), text = "Humidity")
-            Detail(data = data.clouds.all.toString(), text = "Clouds")
 
         }
     }

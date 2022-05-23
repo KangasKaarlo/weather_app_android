@@ -38,6 +38,7 @@ fun BottomBar(navController: NavHostController) {
         }
     }
 }
+//Function to add a button to the bottom bar
 @Composable
 fun RowScope.AddItem(screen: BottomAppBar,  currentDestination : NavDestination?, navController: NavHostController) {
     BottomNavigationItem(
